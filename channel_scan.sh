@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Matt Coates 2018
+# scan NA UHF ATSC frequencies, with a 3mhz offset.
+
+#freq="473000 479000 485000 683000 689000 695000"
+freq="473000 479000 485000 491000 497000 503000 509000 515000 521000 527000 533000 539000 545000 551000 557000 563000 569000 575000 581000 587000 593000 599000 605000 611000 617000 623000 629000 635000 641000 647000 653000 659000 665000 671000 677000 683000 689000 695000 701000 707000 713000 719000 725000 731000 737000 743000 749000 755000 761000 767000 773000 779000 785000 791000 797000 803000 809000 815000 821000 827000 833000 839000 845000 851000 857000 863000 869000 875000 881000 887000"
+
+echo -n '<msg type="login_req"><params protocol="TCP" port="8000"/></msg>' | nc 192.168.1.1 6000
+expected='ack_info ret="0"'
+for f in $freq
+do
+  request="<msg type=\"tune_req\"><params tv_type=\"ATSC\" freq=\"$f\" bandwidth=\"8000\" plp=\"0\" programNumber=\"0\"/></msg>"
+  result=`echo -n $request | nc 192.168.1.1 6000`
+  echo $result | grep "$expected" > /dev/null
+  if [ $? == "0" ]
+  then
+    echo $f
+    sleep 10
+  fi
+  #echo $? $f
+done
+  
